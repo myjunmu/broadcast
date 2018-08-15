@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>lunbo</title>
+  <meta charset="utf-8">
+  <style type="text/css">
+    *{
+      padding:0;
+      margin:0;
+    }
+    a{
+      text-decoration: none;
+    }
+    li{
+      list-style: none;
+    }
+    #container{
+      width:750px;
+      height:200px;
+      border:1px solid black;
+      position:relative;
+      overflow: hidden;
+      margin: 50px auto;
+    }
+    #content{
+      width:600%;
+      position:absolute;
+    }
+    img{
+      float:left;
+    }
+    #buttons{
+      position:absolute;
+      bottom:8px;
+      z-index: 2;
+      width: 100px;
+      left: 50%;
+      margin-left: -50px;
+    }
+    #buttons span{
+      text-align:center;
+      float:left;
+      width:10px;
+      height:10px;
+      border-radius: 50%;
+      background-color: #fff;
+      margin:0 5px;
+      cursor:pointer;
+    }
+    #buttons .on{
+      background-color: orange;
+    }
+    .arrow{
+      display: none;
+      width:40px;
+      height:40px;
+      line-height: 40px;
+      font-size: 26px;
+      font-weight:500;
+      position:absolute;
+      top:80px;
+      z-index:2;
+      color:#fff;
+      background-color: rgba(0,0,0,0.3);
+      text-align:center;
+    }
+    .arrow:hover{
+      background-color: rgba(0,0,0,0.7);
+    }
+    .arrow span{
+      display: block;
+      width: 30px;
+      height:30px;
+      margin:auto;
+    }
+    #arrow-left{
+      left:10px;
+    }
+    #arrow-right{
+      right: 10px;
+    }
+    #container:hover .arrow{
+      display: block;
+    } 
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="content" style='left:-750px'>
+      <img src="4.jpg">
+      <img src="1.jpg">
+      <img src="2.jpg">
+      <img src="3.jpg">
+      <img src="4.jpg">
+      <img src="1.jpg">
+    </div>
+    <div id="buttons">
+      <span class="on" data-index="1"></span>
+      <span data-index="2"></span>
+      <span data-index="3"></span>
+      <span data-index="4"></span>
+    </div>
+    <a href="#" class="arrow" id="arrow-left"><span>&lt;</span></a>
+    <a href="#" class="arrow" id="arrow-right"><span>&gt;</span></a> 
+  </div>
+
+  <script type="text/javascript">
+    window.onload=function(){
+      var content=document.getElementById("content");
+      var prev=document.getElementById("arrow-left");
+      var next=document.getElementById("arrow-right");
+      var buttons=document.getElementById("buttons").getElementsByTagName("span");
+      var l=buttons.length;
+      var index=1;
+      var time=300;  //位移总时间
+      var interval=10;  //位移间隔时间
+      var animated=false;  //避免短时间内重复触发动画
+      var timer;
+
+      prev.onclick=function(){
+        if(index==1){
+          index=4
+        }else{
+          index-=1;
+        }
+        if(!animated){
+          move(750);
+        }
+        showButton();
+      }
+
+      next.onclick=function(){
+        if(index==4){
+          index=1
+        }else{
+          index+=1;
+        }
+        if(!animated){
+          move(-750);
+        }
+        showButton();
+      }
+
+      for(var i=0;i<l;i++){
+        buttons[i].onclick=function(){
+          var currentIndex=parseInt(this.getAttribute("data-index"));
+          if(currentIndex==index){
+            return;
+          }else{
+            distance=-750*(currentIndex-index);
+            if(!animated){
+              move(distance);
+            }
+            index=currentIndex;
+            showButton();
+          }
+        }
+      }
+
+      function move(offset){
+        animated=true;
+        var newLeft=parseInt(content.style.left)+offset;
+        var step=offset/(time/interval);  //每次位移的偏移量
+
+        function transition(){
+          if((step>0&&parseInt(content.style.left)<newLeft)||(step<0&&parseInt(content.style.left)>newLeft)){
+            content.style.left=parseInt(content.style.left)+step+'px';
+            setTimeout(transition,10);
+          }else{
+            animated=false;
+            content.style.left=newLeft +'px';
+            if(newLeft<-3000){
+              content.style.left=-750 + 'px';
+            };
+            if(newLeft>-750){
+              content.style.left=-3000+'px';
+            }
+          };
+        }
+        transition();
+      }
+
+       function showButton(){
+        for(var i=0;i<l;i++){
+          if(buttons[i].className=="on"){
+            buttons[i].className="";
+          }
+        }
+        buttons[index-1].className="on";
+      }
+
+      function play(){
+        timer=setInterval(function(){next.click()},3000);
+      }
+      function paused(){
+        clearInterval(timer);
+      }
+
+      container.onmouseover=paused;
+      container.onmouseout=play;
+      play();
+    }
+  </script>
+
+</body>
+</html>
